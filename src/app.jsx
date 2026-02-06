@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Calculator, TrendingUp, DollarSign, Percent, FileText } from 'lucide-react';
 
 const Card = ({ children, className = "" }) => (
@@ -112,7 +112,7 @@ export default function App() {
     let currentGPI = grossPotentialIncomeStart;
 
     // We project one year past hold to get forward NOI for sale
-    const projectionYears = Math.max(inputs.holdPeriod + 1, 10); 
+    const projectionYears = Math.max(inputs.holdPeriod + 1, 10);
 
     for (let year = 1; year <= projectionYears; year++) {
       // -- Operations --
@@ -136,9 +136,9 @@ export default function App() {
       // Implied Expenses Year 1 = GPI_1 - NOI_1 - Vacancy_1.
       // Let's assume Expenses grow at 2% inflation regardless of revenue toggle to be realistic.
       // Implied Expenses Base:
-      const impliedExpensesBase = grossPotentialIncomeStart - (grossPotentialIncomeStart * (inputs.vacancyRate/100)) - year1NOI;
-      const currentExpenses = impliedExpensesBase * Math.pow(1.02, year - 1); 
-      
+      const impliedExpensesBase = grossPotentialIncomeStart - (grossPotentialIncomeStart * (inputs.vacancyRate / 100)) - year1NOI;
+      const currentExpenses = impliedExpensesBase * Math.pow(1.02, year - 1);
+
       const noi = egi - currentExpenses;
 
       // -- Debt Service (Aggregation of 12 months) --
@@ -185,7 +185,7 @@ export default function App() {
     const exitYearIdx = inputs.holdPeriod - 1;
     const forwardYearIdx = inputs.holdPeriod;
     const forwardNOI = schedule[forwardYearIdx]?.noi || 0;
-    
+
     const salePrice = forwardNOI / (inputs.exitCap / 100);
     const saleCostsAmt = salePrice * (inputs.saleCosts / 100);
     const loanPayoff = schedule[exitYearIdx].endLoanBal;
@@ -194,18 +194,18 @@ export default function App() {
     // Cash Flow Stream for IRR
     const cfStream = [-totalEquity]; // Year 0
     for (let i = 0; i < inputs.holdPeriod; i++) {
-        let cf = schedule[i].cfLevered;
-        // Add sale proceeds to final year
-        if (i === inputs.holdPeriod - 1) {
-            cf += netSaleProceeds;
-        }
-        cfStream.push(cf);
+      let cf = schedule[i].cfLevered;
+      // Add sale proceeds to final year
+      if (i === inputs.holdPeriod - 1) {
+        cf += netSaleProceeds;
+      }
+      cfStream.push(cf);
     }
 
     const leveredIRR = calculateIRR(cfStream);
     const totalProfit = cfStream.reduce((a, b) => a + b, 0) + totalEquity; // Sum of positive flows
     const equityMultiple = (totalProfit + totalEquity) / totalEquity;
-    
+
     // Average Cash on Cash
     const totalLeveredCF = schedule.slice(0, inputs.holdPeriod).reduce((sum, yr) => sum + yr.cfLevered, 0);
     const avgCoC = (totalLeveredCF / inputs.holdPeriod) / totalEquity;
@@ -229,7 +229,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans text-gray-800">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
@@ -240,13 +240,13 @@ export default function App() {
             <p className="text-gray-500 text-sm mt-1">Single-Sheet Pro Forma Architecture</p>
           </div>
           <div className="mt-4 md:mt-0 bg-white p-1 rounded-lg border shadow-sm">
-            <button 
+            <button
               onClick={() => setActiveTab('model')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'model' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
             >
               Model View
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('formulas')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'formulas' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
             >
@@ -257,10 +257,10 @@ export default function App() {
 
         {activeTab === 'model' ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            
+
             {/* Left Sidebar: Inputs */}
             <div className="lg:col-span-1 space-y-6">
-              
+
               <Card className="p-4 bg-blue-50/50 border-blue-100">
                 <SectionHeader title="1. Acquisition" icon={DollarSign} />
                 <InputField label="Purchase Price ($)" value={inputs.purchasePrice} onChange={v => updateInput('purchasePrice', v)} step="1000" />
@@ -272,30 +272,30 @@ export default function App() {
               <Card className="p-4">
                 <SectionHeader title="2. Growth Strategy" icon={TrendingUp} />
                 <div className="mb-4">
-                    <label className="block text-xs font-medium text-gray-500 uppercase mb-2">Revenue Growth Type</label>
-                    <div className="flex rounded-md shadow-sm">
-                        <button 
-                            onClick={() => setInputs(p => ({...p, growthType: 'Annual'}))}
-                            className={`flex-1 py-2 text-xs font-medium border rounded-l-md ${inputs.growthType === 'Annual' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
-                        >
-                            Annual %
-                        </button>
-                        <button 
-                            onClick={() => setInputs(p => ({...p, growthType: 'Step-Up'}))}
-                            className={`flex-1 py-2 text-xs font-medium border rounded-r-md ${inputs.growthType === 'Step-Up' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
-                        >
-                            Step-Up
-                        </button>
-                    </div>
+                  <label className="block text-xs font-medium text-gray-500 uppercase mb-2">Revenue Growth Type</label>
+                  <div className="flex rounded-md shadow-sm">
+                    <button
+                      onClick={() => setInputs(p => ({ ...p, growthType: 'Annual' }))}
+                      className={`flex-1 py-2 text-xs font-medium border rounded-l-md ${inputs.growthType === 'Annual' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                    >
+                      Annual %
+                    </button>
+                    <button
+                      onClick={() => setInputs(p => ({ ...p, growthType: 'Step-Up' }))}
+                      className={`flex-1 py-2 text-xs font-medium border rounded-r-md ${inputs.growthType === 'Step-Up' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+                    >
+                      Step-Up
+                    </button>
+                  </div>
                 </div>
-                
+
                 {inputs.growthType === 'Annual' ? (
-                    <InputField label="Annual Growth (%)" value={inputs.annualGrowthRate} onChange={v => updateInput('annualGrowthRate', v)} />
+                  <InputField label="Annual Growth (%)" value={inputs.annualGrowthRate} onChange={v => updateInput('annualGrowthRate', v)} />
                 ) : (
-                    <>
-                        <InputField label="Step Increase (%)" value={inputs.stepUpRate} onChange={v => updateInput('stepUpRate', v)} />
-                        <InputField label="Frequency (Years)" value={inputs.stepUpFreq} onChange={v => updateInput('stepUpFreq', v)} step="1" />
-                    </>
+                  <>
+                    <InputField label="Step Increase (%)" value={inputs.stepUpRate} onChange={v => updateInput('stepUpRate', v)} />
+                    <InputField label="Frequency (Years)" value={inputs.stepUpFreq} onChange={v => updateInput('stepUpFreq', v)} step="1" />
+                  </>
                 )}
                 <InputField label="Hold Period (Years)" value={inputs.holdPeriod} onChange={v => updateInput('holdPeriod', v)} step="1" />
               </Card>
@@ -306,8 +306,8 @@ export default function App() {
                 <InputField label="Interest Rate (%)" value={inputs.interestRate} onChange={v => updateInput('interestRate', v)} />
                 <InputField label="Amortization (Yrs)" value={inputs.amortization} onChange={v => updateInput('amortization', v)} step="1" />
                 <div className="my-4 border-t pt-4">
-                    <InputField label="Exit Cap Rate (%)" value={inputs.exitCap} onChange={v => updateInput('exitCap', v)} />
-                    <InputField label="Sale Costs (%)" value={inputs.saleCosts} onChange={v => updateInput('saleCosts', v)} />
+                  <InputField label="Exit Cap Rate (%)" value={inputs.exitCap} onChange={v => updateInput('exitCap', v)} />
+                  <InputField label="Sale Costs (%)" value={inputs.saleCosts} onChange={v => updateInput('saleCosts', v)} />
                 </div>
               </Card>
 
@@ -315,7 +315,7 @@ export default function App() {
 
             {/* Main Content: Output */}
             <div className="lg:col-span-3 space-y-6">
-              
+
               {/* Summary Metrics Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="p-4 border-l-4 border-l-blue-500">
@@ -362,8 +362,8 @@ export default function App() {
               {/* Pro Forma Table */}
               <Card className="overflow-hidden">
                 <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                    <h3 className="font-bold text-gray-800">Pro Forma Cash Flow</h3>
-                    <span className="text-xs text-gray-500">Values in USD</span>
+                  <h3 className="font-bold text-gray-800">Pro Forma Cash Flow</h3>
+                  <span className="text-xs text-gray-500">Values in USD</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-right">
@@ -407,7 +407,7 @@ export default function App() {
                           <td key={row.year} className="px-4 py-3 text-blue-900">{formatCurrency(row.noi)}</td>
                         ))}
                       </tr>
-                      
+
                       {/* Debt */}
                       <tr className="text-gray-500 italic text-xs">
                         <td className="px-4 py-2 text-left sticky left-0 bg-white pt-4">Debt Schedule</td>
@@ -433,7 +433,7 @@ export default function App() {
                           <td key={row.year} className="px-4 py-3">{formatCurrency(row.cfLevered)}</td>
                         ))}
                       </tr>
-                      
+
                       {/* Metrics */}
                       <tr className="text-xs text-gray-500">
                         <td className="px-4 py-2 text-left sticky left-0 bg-white">DSCR</td>
@@ -458,71 +458,71 @@ export default function App() {
         ) : (
           /* --- Formula Guide Tab --- */
           <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in">
-             <Card className="p-8 border-l-4 border-l-blue-600">
-                <div className="flex items-start gap-4">
-                    <FileText className="w-8 h-8 text-blue-600 mt-1" />
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900">Excel Implementation Guide</h2>
-                        <p className="text-gray-600 mt-2">
-                            To build this exact model in Excel, copy the formulas below into the corresponding cells. 
-                            Assume <span className="font-mono bg-gray-100 px-1 rounded">Year 1</span> starts in Column 
-                            <span className="font-mono bg-gray-100 px-1 rounded">G</span>.
-                        </p>
-                    </div>
+            <Card className="p-8 border-l-4 border-l-blue-600">
+              <div className="flex items-start gap-4">
+                <FileText className="w-8 h-8 text-blue-600 mt-1" />
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Excel Implementation Guide</h2>
+                  <p className="text-gray-600 mt-2">
+                    To build this exact model in Excel, copy the formulas below into the corresponding cells.
+                    Assume <span className="font-mono bg-gray-100 px-1 rounded">Year 1</span> starts in Column
+                    <span className="font-mono bg-gray-100 px-1 rounded">G</span>.
+                  </p>
                 </div>
-             </Card>
+              </div>
+            </Card>
 
-             <div className="space-y-6">
-                <section>
-                    <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">1. The "Step-Up" Growth Formula</h3>
-                    <p className="text-sm text-gray-600 mb-2">This formula handles the toggle between annual growth and 5-year step-ups.</p>
-                    <div className="bg-gray-900 text-gray-100 p-4 rounded-md font-mono text-sm overflow-x-auto">
-                        =IF($D$10="Annual", G20*(1+$D$AnnualPct), IF(MOD(H$5-1, $D$StepFreq)=0, G20*(1+$D$StepPct), G20))
-                    </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                        <strong>Logic:</strong> <code>MOD(H$5-1, 5)</code> checks if the current year (minus 1) is divisible by 5. If 0, it triggers the step-up.
-                    </div>
-                </section>
+            <div className="space-y-6">
+              <section>
+                <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">1. The &quot;Step-Up&quot; Growth Formula</h3>
+                <p className="text-sm text-gray-600 mb-2">This formula handles the toggle between annual growth and 5-year step-ups.</p>
+                <div className="bg-gray-900 text-gray-100 p-4 rounded-md font-mono text-sm overflow-x-auto">
+                  =IF($D$10=&quot;Annual&quot;, G20*(1+$D$AnnualPct), IF(MOD(H$5-1, $D$StepFreq)=0, G20*(1+$D$StepPct), G20))
+                </div>
+                <div className="mt-2 text-xs text-gray-500">
+                  <strong>Logic:</strong> <code>MOD(H$5-1, 5)</code> checks if the current year (minus 1) is divisible by 5. If 0, it triggers the step-up.
+                </div>
+              </section>
 
-                <section>
-                    <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">2. Debt Service (Annual Aggregation)</h3>
-                    <p className="text-sm text-gray-600 mb-2">Use these cumulative functions to sum up monthly payments for the year.</p>
-                    
-                    <div className="grid gap-4">
-                        <div>
-                            <span className="text-xs font-bold uppercase text-gray-500">Interest Payment (IPMT)</span>
-                            <div className="bg-gray-900 text-gray-100 p-3 rounded-md font-mono text-sm mt-1">
-                                =-CUMIPMT(Rate/12, Amort*12, LoanAmt, (Year-1)*12+1, Year*12, 0)
-                            </div>
-                        </div>
-                        <div>
-                            <span className="text-xs font-bold uppercase text-gray-500">Principal Payment (PPMT)</span>
-                            <div className="bg-gray-900 text-gray-100 p-3 rounded-md font-mono text-sm mt-1">
-                                =-CUMPRINC(Rate/12, Amort*12, LoanAmt, (Year-1)*12+1, Year*12, 0)
-                            </div>
-                        </div>
-                    </div>
-                </section>
+              <section>
+                <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">2. Debt Service (Annual Aggregation)</h3>
+                <p className="text-sm text-gray-600 mb-2">Use these cumulative functions to sum up monthly payments for the year.</p>
 
-                <section>
-                    <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">3. Exit Sale Price (Forward NOI)</h3>
-                    <p className="text-sm text-gray-600 mb-2">Standard logic is to cap the <i>next</i> year's income.</p>
-                    <div className="bg-gray-900 text-gray-100 p-4 rounded-md font-mono text-sm">
-                        = (NOI_Year_N_Plus_1) / Exit_Cap_Rate
+                <div className="grid gap-4">
+                  <div>
+                    <span className="text-xs font-bold uppercase text-gray-500">Interest Payment (IPMT)</span>
+                    <div className="bg-gray-900 text-gray-100 p-3 rounded-md font-mono text-sm mt-1">
+                      =-CUMIPMT(Rate/12, Amort*12, LoanAmt, (Year-1)*12+1, Year*12, 0)
                     </div>
-                </section>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold uppercase text-gray-500">Principal Payment (PPMT)</span>
+                    <div className="bg-gray-900 text-gray-100 p-3 rounded-md font-mono text-sm mt-1">
+                      =-CUMPRINC(Rate/12, Amort*12, LoanAmt, (Year-1)*12+1, Year*12, 0)
+                    </div>
+                  </div>
+                </div>
+              </section>
 
-                 <section>
-                    <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">4. Levered IRR</h3>
-                    <p className="text-sm text-gray-600 mb-2">Your range must include the negative equity outflow in Year 0.</p>
-                    <div className="bg-gray-900 text-gray-100 p-4 rounded-md font-mono text-sm">
-                        = IRR( F40:P40 )
-                    </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                        Where F40 is Year 0 (Total Equity as negative) and P40 is Year 10 (Cash Flow + Sale Proceeds).
-                    </div>
-                </section>
-             </div>
+              <section>
+                <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">3. Exit Sale Price (Forward NOI)</h3>
+                <p className="text-sm text-gray-600 mb-2">Standard logic is to cap the <i>next</i> year&apos;s income.</p>
+                <div className="bg-gray-900 text-gray-100 p-4 rounded-md font-mono text-sm">
+                  = (NOI_Year_N_Plus_1) / Exit_Cap_Rate
+                </div>
+              </section>
+
+              <section>
+                <h3 className="font-bold text-gray-800 border-b pb-2 mb-3">4. Levered IRR</h3>
+                <p className="text-sm text-gray-600 mb-2">Your range must include the negative equity outflow in Year 0.</p>
+                <div className="bg-gray-900 text-gray-100 p-4 rounded-md font-mono text-sm">
+                  = IRR( F40:P40 )
+                </div>
+                <div className="mt-2 text-xs text-gray-500">
+                  Where F40 is Year 0 (Total Equity as negative) and P40 is Year 10 (Cash Flow + Sale Proceeds).
+                </div>
+              </section>
+            </div>
           </div>
         )}
 
